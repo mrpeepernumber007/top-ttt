@@ -5,19 +5,19 @@ const boardModule = (function() {
 
     function Space (index) {
         this.name = index,
-        this.mark = '',
-        domDisplay = () => {
-            const space = document.createElement('div')
-            space.classList.add('board-space')
-            board.appendChild(space)
-        }
+        this.mark = ''
+    }
+
+    function domDisplay(spaceObj) {
+        const spaceElement = document.createElement('div')
+        spaceElement.classList.add('board-space')
+        spaceElement.setAttribute('data-index', spaceObj.name)
+        board.appendChild(spaceElement)
     }
     
     (function _createSpaces () {
         for (let i = 0; i < 9; i++) {
             const space = new Space(i)
-            // if (i % 2 === 0) {space.mark = 'X'}
-            // else {space.mark = 'O'}
             boardSpaces.push(space)
         }
         renderSpaces()
@@ -25,7 +25,7 @@ const boardModule = (function() {
     
     function renderSpaces() {
         boardSpaces.forEach(space => {
-            this.domDisplay()
+            domDisplay(space)
         })
     }
     
@@ -35,8 +35,9 @@ const boardModule = (function() {
     }
 })()
 
-// const playerModule = (function() {
-//     (function iterate() {
-//         boardSpaces.forEach(space => console.log(space))
-//     })()
-// })()
+const playerModule = (function() {
+    const spaces = document.querySelectorAll('.board-space')
+    spaces.forEach(space => space.addEventListener('click', () => {
+        boardSpaces[space.dataset.index].mark = 'X'
+    }))
+})()
