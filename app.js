@@ -12,6 +12,7 @@ const boardModule = (function() {
         const spaceElement = document.createElement('div')
         spaceElement.classList.add('board-space')
         spaceElement.setAttribute('data-index', spaceObj.name)
+        spaceElement.textContent = spaceObj.mark
         board.appendChild(spaceElement)
     }
     
@@ -35,32 +36,6 @@ const boardModule = (function() {
     }
 })()
 
-const playModule = (function() {
-    const spaces = document.querySelectorAll('.board-space')
-    //turnOver has to come in from turnModule, use turnOver as an argument in playModule
-    let turnOver = true
-
-    function interact(playermark){
-        spaces.forEach(space => space.addEventListener('click', () => {
-            turnOver = !turnOver;
-            addMark(playermark, space, turnOver)
-        }))
-    }
-    
-    function addMark(playermark, space, turnOver) {
-        if((space.textContent === '') && !turnOver) {
-            boardSpaces[space.dataset.index].mark = playermark
-            space.textContent = playermark
-            turnOver = true
-        }
-    }
-
-
-    return {
-        interact,
-    }
-})()
-
 const playerModule = (function(){
     function playerCreator(name, mark, computer) {
         const playerName = name
@@ -69,14 +44,12 @@ const playerModule = (function(){
         
         const getPlayerScore = () => playerScore
         const updatePlayerScore = () => playerScore++
-        // const playerAction = () => playModule.interact(playerMark)
 
         return {
             playerName,
             playerMark,
             updatePlayerScore,
             getPlayerScore,
-            // playerAction
         }
     }
 
@@ -86,35 +59,47 @@ const playerModule = (function(){
     }
 })()
 
+const players = []
+
 const fede = playerModule.playerCreator('Fede', 'X')
 const pepe = playerModule.playerCreator('Pepe', 'O')
+players.push(fede)
+players.push(pepe)
 
-const nextTurn = document.querySelector('.next-turn-btn')
-let turnCount = 0
-
-const turnModule = function() {
-
-    if(turnCount % 2 === 0) {
-        fede.playerAction()
-        turnCount++
-    } else if (turnCount % 2 !== 0) {
-        pepe.playerAction()
-        turnCount++
+const playModule = (function() {
+    const spaces = document.querySelectorAll('.board-space')
+    
+    function interact(){
+        let turnNum = 0;
+        spaces.forEach(space => space.addEventListener('click', () => {
+            if (space.textContent === '') {
+                addMark(turnNum, space)
+                turnNum++
+            }
+            console.log(boardSpaces);
+            checkGame()
+        }))
     }
+    
+    //if player2 is ai turnNum doesnt change, or rather it redirects to other code
+    function addMark(turnNum, space) {
+        if (turnNum % 2 === 0) {
+            boardSpaces[space.getAttribute('data-index')].mark = players[0].playerMark
+            space.textContent = players[0].playerMark
+        } else if (turnNum % 2 !== 0) {
+            boardSpaces[space.getAttribute('data-index')].mark = players[1].playerMark
+            space.textContent = players[1].playerMark
+        }
+    }
+    interact()
+
+
+    return {
+        interact,
+    }
+})()
+
+function checkGame () {
+    const spaces = document.querySelectorAll('.board-space')
+    
 }
-
-nextTurn.addEventListener('click', turnModule)
-
-
-// const turnModule = (function(){
-//     const fede = playerModule.playerCreator('Fede', 'X')
-//     let turnOver = false
-//     playModule(turnOver)
-//     return {
-//         fede,
-//         turnOver
-//     }
-// })()
-
-// alternating turn system with recursion and % of 2 with variable that adds 1 after turnOver is set to true, unless finish condition is met (finish condition is first if)
-// turn system with event listener, alternating x and o, and checks for victory conditions
