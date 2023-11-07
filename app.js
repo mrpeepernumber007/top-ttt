@@ -68,15 +68,17 @@ players.push(pepe)
 
 const playModule = (function() {
     const spaces = document.querySelectorAll('.board-space')
+    let p1Choices = []
+    let p2Choices = []
     
     function interact(){
         let turnNum = 0;
+
         spaces.forEach(space => space.addEventListener('click', () => {
             if (space.textContent === '') {
                 addMark(turnNum, space)
                 turnNum++
             }
-            console.log(boardSpaces);
             checkGame()
         }))
     }
@@ -86,20 +88,30 @@ const playModule = (function() {
         if (turnNum % 2 === 0) {
             boardSpaces[space.getAttribute('data-index')].mark = players[0].playerMark
             space.textContent = players[0].playerMark
+            p1Choices.push(boardSpaces[space.getAttribute('data-index')].name)
         } else if (turnNum % 2 !== 0) {
             boardSpaces[space.getAttribute('data-index')].mark = players[1].playerMark
             space.textContent = players[1].playerMark
+            p2Choices.push(boardSpaces[space.getAttribute('data-index')].name)
         }
     }
     interact()
 
+    function endGame() {
+        const winCon = [
+            [1,2,3],
+            [4,5,6],
+            [7,8,9],
+            [1,5,9],
+            [3,5,7],
+            [1,4,7],
+            [2,5,8],
+            [3,6,9]
+        ]
+    }
+    
 
     return {
         interact,
     }
 })()
-
-function checkGame () {
-    const spaces = document.querySelectorAll('.board-space')
-    
-}
