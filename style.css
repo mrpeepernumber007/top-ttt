@@ -22,4 +22,11 @@ body {
 .board-space {
     background-color: #fff;
     margin: 5px;
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: 700;
+    font-size: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
