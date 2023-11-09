@@ -40,7 +40,8 @@ const playerModule = (function(){
     function playerCreator(name, mark, computer) {
         const playerName = name
         const playerMark = mark
-        const playerScore = 0
+        const playerAI = computer
+        let playerScore = 0
         
         const getPlayerScore = () => playerScore
         const updatePlayerScore = () => playerScore++
@@ -48,6 +49,7 @@ const playerModule = (function(){
         return {
             playerName,
             playerMark,
+            playerAI,
             updatePlayerScore,
             getPlayerScore,
         }
@@ -59,12 +61,8 @@ const playerModule = (function(){
     }
 })()
 
-const players = []
-
-const player1 = playerModule.playerCreator('Fede', 'X')
-const player2 = playerModule.playerCreator('Pepe', 'O')
-players.push(player1)
-players.push(player2)
+const player1 = playerModule.playerCreator('Fede', 'X', false)
+const player2 = playerModule.playerCreator('Pepe', 'O', false)
 
 const playModule = (function() {
     const spaces = document.querySelectorAll('.board-space')
@@ -73,35 +71,50 @@ const playModule = (function() {
     
     function interact(){
         let turnNum = 0;
-
         spaces.forEach(space => space.addEventListener('click', () => {
             if (space.textContent === '') {
-                addMark(turnNum, space)
+                if (turnNum % 2 === 0){
+                    addMark(turnNum, space, player1, p1Choices)
+                } else if ((turnNum % 2 !== 0) && (player2.playerAI === false)) {
+                    addMark(turnNum, space, player2, p2Choices)
+                } else if ((turnNum % 2 !== 0) && (player2.playerAI === true)) {
+                    //missing ai parameter
+                    addMark(turnNum, space, player2, p2Choices)
+                }
                 turnNum++
             }
         }))
     }
+
+    function playerVictory(choices, player) {
+        const check = endModule.endGame(choices)
+        if(check) {
+            choices = []
+            player.updatePlayerScore()
+            return console.log(player.getPlayerScore());
+        }
+    }
     
     //if player2 is ai turnNum doesnt change, or rather it redirects to other code
-    function addMark(turnNum, space) {
-        if (turnNum % 2 === 0) {
-            boardSpaces[space.getAttribute('data-index')].mark = players[0].playerMark
-            space.textContent = players[0].playerMark
-            p1Choices.push(boardSpaces[space.getAttribute('data-index')].name)
-
-            const check = endGame(p1Choices)
-            if (check) {console.log('p1 victory');}
-        } else if (turnNum % 2 !== 0) {
-            boardSpaces[space.getAttribute('data-index')].mark = players[1].playerMark
-            space.textContent = players[1].playerMark
-            p2Choices.push(boardSpaces[space.getAttribute('data-index')].name)
-
-            const check = endGame(p2Choices)
-            if(check) {console.log('p2 victory');}
-        }
+    function addMark(turnNum, space, player, choices) {
+        boardSpaces[space.getAttribute('data-index')].mark = player.playerMark
+        space.textContent = player.playerMark
+        choices.push(boardSpaces[space.getAttribute('data-index')].name)
+            
+        playerVictory(choices, player)
     }
     interact()
 
+    
+    return {
+        interact,
+        addMark,
+        p1Choices,
+        p2Choices,
+    }
+})()
+
+const endModule = (function (){
     function endGame(playerChoice) {
         const winCon = [
             [0,1,2],
@@ -113,16 +126,12 @@ const playModule = (function() {
             [1,4,7],
             [2,5,8]
         ]
-        // p1Choices.sort()
-        // p2Choices.sort()
-        // const p1Str = p1Choices.join('').toString('')
-        // const p2Str = p2Choices.join('').toString('')
+
         playerChoice.sort()
         const pChoiceStr = playerChoice.join('').toString('')
         let victory = false;
 
         //this function uses forEach which doesn't have a break statement
-        //if it becomes necessary in later implementations replace forEach with a for loop
         function checkVictory(choices) {
             winCon.forEach((comb) => {
                 let includes = 0
@@ -134,9 +143,6 @@ const playModule = (function() {
                         }
                     }
                     if (includes >= 3) {
-                        // victory speech here
-                        // player1.updatePlayerScore
-                        // player1.getPlayerScore
                         return victory = true
                     }
                 })
@@ -145,9 +151,8 @@ const playModule = (function() {
         checkVictory(pChoiceStr)
         return victory
     }
-    
 
     return {
-        interact, endGame
+        endGame
     }
 })()
