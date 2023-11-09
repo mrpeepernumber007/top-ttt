@@ -73,13 +73,15 @@ const playModule = (function() {
         let turnNum = 0;
         spaces.forEach(space => space.addEventListener('click', () => {
             if (space.textContent === '') {
-                if (turnNum % 2 === 0){
-                    addMark(turnNum, space, player1, p1Choices)
+                if ((turnNum % 2 === 0) && (player2.playerAI === false)){
+                    addMark(space, player1, p1Choices)
                 } else if ((turnNum % 2 !== 0) && (player2.playerAI === false)) {
-                    addMark(turnNum, space, player2, p2Choices)
-                } else if ((turnNum % 2 !== 0) && (player2.playerAI === true)) {
+                    addMark(space, player2, p2Choices)
+                } else if ((turnNum % 2 === 0) && (player2.playerAI === true)) {
                     //missing ai parameter
-                    addMark(turnNum, space, player2, p2Choices)
+                    //when player1 clicks, player2AI makes a play
+                    addMark(space, player1, p1Choices)
+                    addMark(space, player2, p2Choices, true)
                 }
                 turnNum++
             }
@@ -96,10 +98,14 @@ const playModule = (function() {
     }
     
     //if player2 is ai turnNum doesnt change, or rather it redirects to other code
-    function addMark(turnNum, space, player, choices) {
-        boardSpaces[space.getAttribute('data-index')].mark = player.playerMark
-        space.textContent = player.playerMark
-        choices.push(boardSpaces[space.getAttribute('data-index')].name)
+    function addMark(space, player, choices, ai) {
+        if (!ai) {
+            boardSpaces[space.getAttribute('data-index')].mark = player.playerMark
+            space.textContent = player.playerMark
+            choices.push(boardSpaces[space.getAttribute('data-index')].name)
+        } else if (ai) {
+            //ai implementation here
+        }
             
         playerVictory(choices, player)
     }
@@ -156,3 +162,6 @@ const endModule = (function (){
         endGame
     }
 })()
+
+//to end the game, revise boardModule to enable resetting the board
+//in playerVictory reset boardSpaces value to boardSpaces = []
