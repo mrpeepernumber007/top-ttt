@@ -79,7 +79,6 @@ const playModule = (function() {
                 addMark(turnNum, space)
                 turnNum++
             }
-            checkGame()
         }))
     }
     
@@ -99,19 +98,43 @@ const playModule = (function() {
 
     function endGame() {
         const winCon = [
-            [1,2,3],
-            [4,5,6],
-            [7,8,9],
-            [1,5,9],
-            [3,5,7],
+            [0,1,2],
+            [3,4,5],
+            [6,7,8],
+            [0,4,8],
+            [2,4,6],
+            [0,3,6],
             [1,4,7],
-            [2,5,8],
-            [3,6,9]
+            [2,5,8]
         ]
+        p1Choices.sort()
+        p2Choices.sort()
+        const p1Str = p1Choices.join('').toString('')
+        const p2Str = p2Choices.join('').toString('')
+
+        function checkVictory(choices) {
+            winCon.forEach((comb) => {
+                let includes = 0
+                comb.forEach((num) => {
+                    let numStr = num.toString()
+                    for (let i = 0; i < choices.length; i++) {
+                        if (choices[i].includes(numStr)) {
+                            includes++
+                        }
+                    }
+                    if (includes >= 3) {
+                        // victory speech here
+                        console.log('ganastre, trolo');
+                    }
+                })
+            })
+        }
     }
     
+    const checkBtn = document.querySelector('.check-choices')
+    checkBtn.addEventListener('click', endGame)
 
     return {
-        interact,
+        interact
     }
 })()
