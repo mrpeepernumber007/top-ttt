@@ -61,10 +61,10 @@ const playerModule = (function(){
 
 const players = []
 
-const fede = playerModule.playerCreator('Fede', 'X')
-const pepe = playerModule.playerCreator('Pepe', 'O')
-players.push(fede)
-players.push(pepe)
+const player1 = playerModule.playerCreator('Fede', 'X')
+const player2 = playerModule.playerCreator('Pepe', 'O')
+players.push(player1)
+players.push(player2)
 
 const playModule = (function() {
     const spaces = document.querySelectorAll('.board-space')
@@ -88,15 +88,21 @@ const playModule = (function() {
             boardSpaces[space.getAttribute('data-index')].mark = players[0].playerMark
             space.textContent = players[0].playerMark
             p1Choices.push(boardSpaces[space.getAttribute('data-index')].name)
+
+            const check = endGame(p1Choices)
+            if (check) {console.log('p1 victory');}
         } else if (turnNum % 2 !== 0) {
             boardSpaces[space.getAttribute('data-index')].mark = players[1].playerMark
             space.textContent = players[1].playerMark
             p2Choices.push(boardSpaces[space.getAttribute('data-index')].name)
+
+            const check = endGame(p2Choices)
+            if(check) {console.log('p2 victory');}
         }
     }
     interact()
 
-    function endGame() {
+    function endGame(playerChoice) {
         const winCon = [
             [0,1,2],
             [3,4,5],
@@ -107,11 +113,16 @@ const playModule = (function() {
             [1,4,7],
             [2,5,8]
         ]
-        p1Choices.sort()
-        p2Choices.sort()
-        const p1Str = p1Choices.join('').toString('')
-        const p2Str = p2Choices.join('').toString('')
+        // p1Choices.sort()
+        // p2Choices.sort()
+        // const p1Str = p1Choices.join('').toString('')
+        // const p2Str = p2Choices.join('').toString('')
+        playerChoice.sort()
+        const pChoiceStr = playerChoice.join('').toString('')
+        let victory = false;
 
+        //this function uses forEach which doesn't have a break statement
+        //if it becomes necessary in later implementations replace forEach with a for loop
         function checkVictory(choices) {
             winCon.forEach((comb) => {
                 let includes = 0
@@ -124,17 +135,19 @@ const playModule = (function() {
                     }
                     if (includes >= 3) {
                         // victory speech here
-                        console.log('ganastre, trolo');
+                        // player1.updatePlayerScore
+                        // player1.getPlayerScore
+                        return victory = true
                     }
                 })
             })
         }
+        checkVictory(pChoiceStr)
+        return victory
     }
     
-    const checkBtn = document.querySelector('.check-choices')
-    checkBtn.addEventListener('click', endGame)
 
     return {
-        interact
+        interact, endGame
     }
 })()
